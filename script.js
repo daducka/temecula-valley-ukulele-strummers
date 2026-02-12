@@ -6,9 +6,11 @@ let songsByDrive = {};
 
 // Initialize when DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
+    initializeDarkMode();
     loadConfig();
     setupSearch();
     setupHamburgerMenu();
+    setupDarkModeToggle();
 });
 
 // Load configuration and initialize
@@ -257,5 +259,40 @@ function downloadPDF(pdfUrl, songName) {
         // Fallback to original behavior if ID extraction fails
         const filename = pdfUrl.split('/').pop();
         triggerDownload(pdfUrl, filename);
+    }
+}
+
+// Dark mode functionality
+function initializeDarkMode() {
+    // Check for saved dark mode preference
+    const isDarkMode = localStorage.getItem('darkMode') === 'true';
+    if (isDarkMode) {
+        document.body.classList.add('dark-mode');
+        updateDarkModeIcon(true);
+    }
+}
+
+function setupDarkModeToggle() {
+    const darkModeToggle = document.querySelector('.dark-mode-toggle');
+    if (darkModeToggle) {
+        darkModeToggle.addEventListener('click', function() {
+            const isDarkMode = document.body.classList.toggle('dark-mode');
+            localStorage.setItem('darkMode', isDarkMode);
+            updateDarkModeIcon(isDarkMode);
+        });
+    }
+}
+
+function updateDarkModeIcon(isDarkMode) {
+    const sunIcon = document.querySelector('.sun-icon');
+    const moonIcon = document.querySelector('.moon-icon');
+    if (sunIcon && moonIcon) {
+        if (isDarkMode) {
+            sunIcon.style.display = 'none';
+            moonIcon.style.display = 'block';
+        } else {
+            sunIcon.style.display = 'block';
+            moonIcon.style.display = 'none';
+        }
     }
 }
