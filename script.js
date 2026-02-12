@@ -31,26 +31,49 @@ function displaySongs(songs) {
         return;
     }
     
-    songList.innerHTML = songs.map(song => `
-        <div class="song-row">
-            <div class="song-name">${song.name}</div>
-            <div class="song-actions">
-                <button class="icon-btn view-btn" onclick="viewPDF('${song.pdfUrl}')" title="View PDF">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                        <circle cx="12" cy="12" r="3"></circle>
-                    </svg>
-                </button>
-                <button class="icon-btn download-btn" onclick="downloadPDF('${song.pdfUrl}')" title="Download PDF">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                        <polyline points="7 10 12 15 17 10"></polyline>
-                        <line x1="12" y1="15" x2="12" y2="3"></line>
-                    </svg>
-                </button>
-            </div>
-        </div>
-    `).join('');
+    // Clear existing content
+    songList.innerHTML = '';
+    
+    // Create song rows safely without XSS vulnerabilities
+    songs.forEach(song => {
+        const songRow = document.createElement('div');
+        songRow.className = 'song-row';
+        
+        const songName = document.createElement('div');
+        songName.className = 'song-name';
+        songName.textContent = song.name; // Use textContent to prevent XSS
+        
+        const songActions = document.createElement('div');
+        songActions.className = 'song-actions';
+        
+        // Create view button
+        const viewBtn = document.createElement('button');
+        viewBtn.className = 'icon-btn view-btn';
+        viewBtn.title = 'View PDF';
+        viewBtn.innerHTML = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+            <circle cx="12" cy="12" r="3"></circle>
+        </svg>`;
+        viewBtn.addEventListener('click', () => viewPDF(song.pdfUrl));
+        
+        // Create download button
+        const downloadBtn = document.createElement('button');
+        downloadBtn.className = 'icon-btn download-btn';
+        downloadBtn.title = 'Download PDF';
+        downloadBtn.innerHTML = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="7 10 12 15 17 10"></polyline>
+            <line x1="12" y1="15" x2="12" y2="3"></line>
+        </svg>`;
+        downloadBtn.addEventListener('click', () => downloadPDF(song.pdfUrl));
+        
+        // Assemble the song row
+        songActions.appendChild(viewBtn);
+        songActions.appendChild(downloadBtn);
+        songRow.appendChild(songName);
+        songRow.appendChild(songActions);
+        songList.appendChild(songRow);
+    });
 }
 
 // Setup search functionality
