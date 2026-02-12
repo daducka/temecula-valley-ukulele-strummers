@@ -6,58 +6,64 @@
     <title>Songs - Temecula Valley Ukulele Strummers</title>
     <link rel="stylesheet" href="styles.css">
 </head>
-<body>
-    <header>
-        <h1>Temecula Valley Ukulele Strummers</h1>
-        <nav>
-            <ul>
-                <li><a href="index.html">Home</a></li>
-                <li><a href="songs.html">Songs</a></li>
-            </ul>
-        </nav>
+<body class="songs-page">
+    <!-- Header with hamburger, logo, and social icons -->
+    <header class="songs-header">
+        <button class="hamburger-menu" aria-label="Menu">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="3" y1="6" x2="21" y2="6"></line>
+                <line x1="3" y1="12" x2="21" y2="12"></line>
+                <line x1="3" y1="18" x2="21" y2="18"></line>
+            </svg>
+        </button>
+        
+        <div class="header-logo">
+            <img src="https://via.placeholder.com/150x60/667eea/ffffff?text=TVUS" alt="TVUS Logo">
+        </div>
+        
+        <div class="social-icons">
+            <a href="#" class="social-icon" aria-label="Facebook">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path>
+                </svg>
+            </a>
+            <a href="#" class="social-icon" aria-label="Instagram">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+                    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+                    <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+                </svg>
+            </a>
+        </div>
     </header>
 
-    <main>
-        <section class="songs">
-            <h2>Our Song Collection</h2>
-            <p>Here's our collection of songs we love to play together!</p>
-            
-            <div class="song-list">
-                <article class="song-item">
-                    <h3>Somewhere Over the Rainbow</h3>
-                    <p class="artist">Israel Kamakawiwo'ole</p>
-                    <p class="difficulty">Difficulty: Beginner</p>
-                </article>
+    <main class="songs-main">
+        <!-- Tabs -->
+        <div class="tabs">
+            <button class="tab-btn active" data-tab="songs-1">SONGS-1</button>
+            <button class="tab-btn" data-tab="songs-2">SONGS-2</button>
+        </div>
 
-                <article class="song-item">
-                    <h3>Riptide</h3>
-                    <p class="artist">Vance Joy</p>
-                    <p class="difficulty">Difficulty: Beginner</p>
-                </article>
+        <!-- Search Bar -->
+        <div class="search-bar">
+            <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="11" cy="11" r="8"></circle>
+                <path d="m21 21-4.35-4.35"></path>
+            </svg>
+            <input type="text" id="search-input" placeholder="Search songs..." aria-label="Search songs">
+        </div>
 
-                <article class="song-item">
-                    <h3>I'm Yours</h3>
-                    <p class="artist">Jason Mraz</p>
-                    <p class="difficulty">Difficulty: Beginner</p>
-                </article>
-
-                <article class="song-item">
-                    <h3>Hey Soul Sister</h3>
-                    <p class="artist">Train</p>
-                    <p class="difficulty">Difficulty: Intermediate</p>
-                </article>
-
-                <article class="song-item">
-                    <h3>Can't Help Falling in Love</h3>
-                    <p class="artist">Elvis Presley</p>
-                    <p class="difficulty">Difficulty: Beginner</p>
-                </article>
-            </div>
-        </section>
+        <!-- Song List -->
+        <div id="song-list" class="song-list-container">
+            <!-- Songs will be loaded dynamically from JSON -->
+        </div>
     </main>
 
-    <footer>
+    <!-- Footer -->
+    <footer class="songs-footer">
         <p>&copy; 2026 Temecula Valley Ukulele Strummers</p>
     </footer>
+
+    <script src="script.js"></script>
 </body>
 </html>
