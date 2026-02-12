@@ -112,9 +112,30 @@ function setupTabs() {
 // Setup hamburger menu toggle
 function setupHamburgerMenu() {
     const hamburger = document.querySelector('.hamburger-menu');
-    if (hamburger) {
+    const menuOverlay = document.getElementById('menu-overlay');
+    const menuClose = document.querySelector('.menu-close');
+    
+    if (hamburger && menuOverlay) {
+        // Open menu
         hamburger.addEventListener('click', function() {
-            alert('Menu functionality coming soon!');
+            menuOverlay.classList.add('active');
+            document.body.style.overflow = 'hidden'; // Prevent scrolling when menu is open
+        });
+        
+        // Close menu with close button
+        if (menuClose) {
+            menuClose.addEventListener('click', function() {
+                menuOverlay.classList.remove('active');
+                document.body.style.overflow = ''; // Restore scrolling
+            });
+        }
+        
+        // Close menu when clicking overlay background
+        menuOverlay.addEventListener('click', function(e) {
+            if (e.target === menuOverlay) {
+                menuOverlay.classList.remove('active');
+                document.body.style.overflow = ''; // Restore scrolling
+            }
         });
     }
 }
