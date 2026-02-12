@@ -66,7 +66,7 @@ function displaySongs(songs) {
             <polyline points="7 10 12 15 17 10"></polyline>
             <line x1="12" y1="15" x2="12" y2="3"></line>
         </svg>`;
-        downloadBtn.addEventListener('click', () => downloadPDF(song.pdfUrl));
+        downloadBtn.addEventListener('click', () => downloadPDF(song.pdfUrl, song.name));
         
         // Assemble the song row
         songActions.appendChild(viewBtn);
@@ -139,19 +139,50 @@ function setupHamburgerMenu() {
     }
 }
 
-// View PDF (opens in new tab)
-function viewPDF(pdfUrl) {
-    // In a real app, this would open the actual PDF
-    window.open(pdfUrl, '_blank');
+// Extract Google Drive file ID from URL
+function extractFileId(url) {
+    // Extract ID from URL patterns like:
+    // https://drive.usercontent.google.com/u/0/uc?id={id}&export=download
+    // https://drive.google.com/file/d/{id}/view
+    const match = url.match(/[?&]id=([^&]+)/) || url.match(/\/d\/([^/]+)\//);
+    return match ? match[1] : null;
 }
 
-// Download PDF
-function downloadPDF(pdfUrl) {
-    // In a real app, this would trigger a download
+// Helper function to trigger download
+function triggerDownload(url, filename) {
     const link = document.createElement('a');
-    link.href = pdfUrl;
-    link.download = pdfUrl.split('/').pop();
+    link.href = url;
+    link.download = filename || '';
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+}
+
+// View PDF (opens in new tab)
+function viewPDF(pdfUrl) {
+    const fileId = extractFileId(pdfUrl);
+    if (fileId) {
+        // Use the view URL format for Google Drive
+        const viewUrl = `https://drive.google.com/file/d/${fileId}/view`;
+        window.open(viewUrl, '_blank');
+    } else {
+        // Fallback to original URL if ID extraction fails
+        window.open(pdfUrl, '_blank');
+    }
+}
+
+// Download PDF
+function downloadPDF(pdfUrl, songName) {
+    const fileId = extractFileId(pdfUrl);
+    if (fileId) {
+        // Use the download URL format for Google Drive
+        const downloadUrl = `https://drive.usercontent.google.com/u/0/uc?id=${fileId}&export=download`;
+        // Use song name as filename if available, add .pdf extension if not already present
+        const filename = songName ? (songName.endsWith('.pdf') ? songName : `${songName}.pdf`) : '';
+        triggerDownload(downloadUrl, filename);
+    } else {
+        // Fallback to original behavior if ID extraction fails
+        const filename = pdfUrl.split('/').pop();
+        triggerDownload(pdfUrl, filename);
+    }
 }
