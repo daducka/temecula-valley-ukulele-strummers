@@ -3,6 +3,9 @@ let allSongs = [];
 let currentTab = null;
 let driveConfigs = [];
 let songsByDrive = {};
+let currentPage = 1;
+let itemsPerPage = 20;
+let filteredSongs = [];
 
 // Initialize when DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
@@ -92,23 +95,37 @@ async function loadAllSongs() {
 // Display songs for the current tab
 function displaySongsForCurrentTab() {
     allSongs = songsByDrive[currentTab] || [];
-    displaySongs(allSongs);
+    currentPage = 1; // Reset to page 1 when switching tabs
+    filteredSongs = allSongs;
+    displaySongs(filteredSongs);
 }
 
 // Display songs in the list
 function displaySongs(songs) {
     const songList = document.getElementById('song-list');
+    filteredSongs = songs;
     
     if (songs.length === 0) {
         songList.innerHTML = '<p class="no-results">No songs found.</p>';
         return;
     }
     
+    // Check if current page is beyond available pages and reset if needed
+    const totalPages = Math.ceil(songs.length / itemsPerPage);
+    if (currentPage > totalPages) {
+        currentPage = 1;
+    }
+    
+    // Calculate pagination
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    const songsToDisplay = songs.slice(startIndex, endIndex);
+    
     // Clear existing content
     songList.innerHTML = '';
     
     // Create song rows safely without XSS vulnerabilities
-    songs.forEach(song => {
+    songsToDisplay.forEach(song => {
         const songRow = document.createElement('div');
         songRow.className = 'song-row';
         
@@ -148,6 +165,63 @@ function displaySongs(songs) {
         songRow.appendChild(songActions);
         songList.appendChild(songRow);
     });
+    
+    // Add pagination controls
+    renderPagination(songs.length);
+}
+
+// Render pagination controls
+function renderPagination(totalItems) {
+    const totalPages = Math.ceil(totalItems / itemsPerPage);
+    
+    // Remove existing pagination if it exists
+    const existingPagination = document.querySelector('.pagination-container');
+    if (existingPagination) {
+        existingPagination.remove();
+    }
+    
+    // Don't show pagination if only one page
+    if (totalPages <= 1) {
+        return;
+    }
+    
+    const songList = document.getElementById('song-list');
+    const paginationContainer = document.createElement('div');
+    paginationContainer.className = 'pagination-container';
+    
+    // Previous button
+    const prevBtn = document.createElement('button');
+    prevBtn.className = 'pagination-btn';
+    prevBtn.textContent = 'Previous';
+    prevBtn.disabled = currentPage === 1;
+    prevBtn.addEventListener('click', () => {
+        if (currentPage > 1) {
+            currentPage--;
+            displaySongs(filteredSongs);
+        }
+    });
+    paginationContainer.appendChild(prevBtn);
+    
+    // Page info
+    const pageInfo = document.createElement('span');
+    pageInfo.className = 'pagination-info';
+    pageInfo.textContent = `Page ${currentPage} of ${totalPages}`;
+    paginationContainer.appendChild(pageInfo);
+    
+    // Next button
+    const nextBtn = document.createElement('button');
+    nextBtn.className = 'pagination-btn';
+    nextBtn.textContent = 'Next';
+    nextBtn.disabled = currentPage === totalPages;
+    nextBtn.addEventListener('click', () => {
+        if (currentPage < totalPages) {
+            currentPage++;
+            displaySongs(filteredSongs);
+        }
+    });
+    paginationContainer.appendChild(nextBtn);
+    
+    songList.appendChild(paginationContainer);
 }
 
 // Setup search functionality
