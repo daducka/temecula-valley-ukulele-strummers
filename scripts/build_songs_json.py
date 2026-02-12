@@ -108,16 +108,16 @@ def list_files_in_folder(service, folder_id: str) -> List[Dict[str, Any]]:
 
 def generate_file_urls(file_id: str) -> str:
     """
-    Generate view URL for a Google Drive file.
-    The same URL works for both viewing and downloading in the browser.
+    Generate download URL for a Google Drive file.
+    Uses the direct download format from drive.usercontent.google.com.
     
     Args:
         file_id: Google Drive file ID
         
     Returns:
-        String with the view URL
+        String with the download URL
     """
-    return f'https://drive.google.com/file/d/{file_id}/view?usp=sharing'
+    return f'https://drive.usercontent.google.com/u/0/uc?id={file_id}&export=download'
 
 
 def build_songs_json(files: List[Dict[str, Any]], folder_id: str) -> List[Dict[str, Any]]:
