@@ -1,0 +1,12 @@
+[
+  {
+    "id": 1,
+    "name": "Sample GTS Song 1",
+    "pdfUrl": "https://drive.usercontent.google.com/u/0/uc?id=sample-id-1&export=download"
+  },
+  {
+    "id": 2,
+    "name": "Sample GTS Song 2",
+    "pdfUrl": "https://drive.usercontent.google.com/u/0/uc?id=sample-id-2&export=download"
+  }
+]

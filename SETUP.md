@@ -1,18 +1,19 @@
-# Setup Instructions: Google Drive PDF Integration
+# Setup Instructions: Multiple Google Drive PDF Integration
 
-This document provides step-by-step instructions for setting up the automated Google Drive PDF listing feature for the Temecula Valley Ukulele Strummers website.
+This document provides step-by-step instructions for setting up the automated Google Drive PDF listing feature for the Temecula Valley Ukulele Strummers website with support for multiple drive sources.
 
 ## Overview
 
-The website automatically fetches a list of PDF song sheets from a Google Drive folder and displays them on the website. This is done using:
-- A Python script that queries the Google Drive API
+The website automatically fetches lists of PDF song sheets from multiple Google Drive folders and displays them on separate tabs on the website. This is done using:
+- A Python script that queries the Google Drive API for multiple folders
+- A `config.json` file that defines the drive sources and tabs
 - A GitHub Actions workflow that runs daily (and can be triggered manually)
 - A service account for secure, automated access to Google Drive
 
 ## Prerequisites
 
 - A Google Cloud Platform account
-- A Google Drive folder with PDF files
+- Google Drive folders with PDF files (one for each tab you want to display)
 - Admin access to this GitHub repository
 
 ## Step 1: Create a Google Cloud Service Account
@@ -70,7 +71,9 @@ The downloaded JSON file will look like this:
 
 **Note the `client_email`** - you'll need this in the next step!
 
-## Step 2: Share Your Google Drive Folder with the Service Account
+## Step 2: Share Your Google Drive Folders with the Service Account
+
+For each Google Drive folder you want to display (e.g., TVUS and GTS):
 
 1. Open Google Drive in your browser
 2. Navigate to the folder containing your PDF song sheets
@@ -79,10 +82,11 @@ The downloaded JSON file will look like this:
 5. Set the permission to "Viewer"
 6. **Uncheck** "Notify people" (the service account doesn't receive emails)
 7. Click "Share"
+8. **Repeat for each folder** you want to integrate
 
-### 2.1 Get Your Folder ID
+### 2.1 Get Your Folder IDs
 
-You need the folder ID to tell the script which folder to read from.
+You need the folder ID for each folder to tell the script which folders to read from.
 
 **Method 1: From the URL**
 1. Open the folder in Google Drive
@@ -91,6 +95,7 @@ You need the folder ID to tell the script which folder to read from.
    https://drive.google.com/drive/folders/1a2B3c4D5e6F7g8H9i0J1k2L3m4N5o6P
    ```
 3. The folder ID is the part after `/folders/`: `1a2B3c4D5e6F7g8H9i0J1k2L3m4N5o6P`
+4. **Save each folder ID** - you'll need them in the next step
 
 **Method 2: From folder details**
 1. Right-click the folder in Google Drive
@@ -111,18 +116,27 @@ GitHub Secrets are used to securely store sensitive information like API keys.
 6. Copy the **entire contents** of the file and paste it into the "Value" field
 7. Click "Add secret"
 
-### 3.2 Add DRIVE_FOLDER_ID Secret
+### 3.2 Add Drive Folder ID Secrets
 
-1. Click "New repository secret" again
-2. For "Name", enter: `DRIVE_FOLDER_ID`
-3. For "Value", paste the folder ID from Step 2.1
+For each drive source in your `config.json`, you need to add a secret:
+
+1. Click "New repository secret"
+2. For "Name", enter: `DRIVE_FOLDER_ID_<DRIVE_ID>` (e.g., `DRIVE_FOLDER_ID_TVUS` for TVUS, `DRIVE_FOLDER_ID_GTS` for GTS)
+3. For "Value", paste the folder ID from Step 2.1 for that specific drive
 4. Click "Add secret"
+5. **Repeat** for each drive source
+
+**Example**: If your `config.json` has:
+- Drive ID: `tvus` → Create secret: `DRIVE_FOLDER_ID_TVUS`
+- Drive ID: `gts` → Create secret: `DRIVE_FOLDER_ID_GTS`
 
 ### 3.3 Verify Your Secrets
 
-After adding both secrets, you should see:
+After adding all secrets, you should see:
 - `SERVICE_ACCOUNT_JSON`
-- `DRIVE_FOLDER_ID`
+- `DRIVE_FOLDER_ID_TVUS`
+- `DRIVE_FOLDER_ID_GTS`
+- (plus any additional drive sources you configured)
 
 You won't be able to view the values after creation (for security), but you can update them if needed.
 
@@ -141,15 +155,17 @@ pip install -r requirements.txt
 **On Linux/Mac:**
 ```bash
 export SERVICE_ACCOUNT_JSON='<paste the entire JSON content here>'
-export DRIVE_FOLDER_ID='<your-folder-id>'
-export OUTPUT_JSON_PATH='songs.json'
+export DRIVE_FOLDER_ID_TVUS='<your-tvus-folder-id>'
+export DRIVE_FOLDER_ID_GTS='<your-gts-folder-id>'
+export CONFIG_PATH='config.json'
 ```
 
 **On Windows (PowerShell):**
 ```powershell
 $env:SERVICE_ACCOUNT_JSON='<paste the entire JSON content here>'
-$env:DRIVE_FOLDER_ID='<your-folder-id>'
-$env:OUTPUT_JSON_PATH='songs.json'
+$env:DRIVE_FOLDER_ID_TVUS='<your-tvus-folder-id>'
+$env:DRIVE_FOLDER_ID_GTS='<your-gts-folder-id>'
+$env:CONFIG_PATH='config.json'
 ```
 
 ### 4.3 Run the Script
@@ -161,22 +177,33 @@ python scripts/build_songs_json.py
 If successful, you should see output like:
 ```
 ============================================================
-Building songs.json from Google Drive
+Building songs JSON files from Google Drive
 ============================================================
-Output path: songs.json
-
+✓ Loaded configuration from config.json
+Found 2 drive(s) to process
 ✓ Successfully loaded service account credentials
 ✓ Successfully connected to Google Drive API
+
+Processing drive: TVUS (tvus)
+  Folder ID: 1a2B3c4D5e6F7g8H9i0J1k2L3m4N5o6P
+  Output file: songs-tvus.json
 Querying folder: 1a2B3c4D5e6F7g8H9i0J1k2L3m4N5o6P
 ✓ Found 15 file(s)
-✓ Successfully wrote 15 song(s) to songs.json
+✓ Successfully wrote 15 song(s) to songs-tvus.json
+
+Processing drive: GTS (gts)
+  Folder ID: 2b3C4d5E6f7G8h9I0j1K2l3M4n5O6p7Q
+  Output file: songs-gts.json
+Querying folder: 2b3C4d5E6f7G8h9I0j1K2l3M4n5O6p7Q
+✓ Found 8 file(s)
+✓ Successfully wrote 8 song(s) to songs-gts.json
 
 ============================================================
 ✓ Successfully completed!
 ============================================================
 ```
 
-Check the `songs.json` file to verify it contains your songs.
+Check the generated JSON files (e.g., `songs-tvus.json`, `songs-gts.json`) to verify they contain your songs.
 
 ## Step 5: Trigger the GitHub Actions Workflow Manually
 
@@ -201,9 +228,9 @@ Now that everything is configured, test the workflow on GitHub.
 ### 5.3 Verify the Results
 
 If the workflow succeeds:
-1. A new commit will be made to your repository with the message "Update songs.json from Google Drive"
-2. The `songs.json` file will be created or updated
-3. You can view the file in your repository to confirm it contains the correct data
+1. New commits will be made to your repository with the message "Update songs JSON files from Google Drive"
+2. The JSON files (e.g., `songs-tvus.json`, `songs-gts.json`) will be created or updated
+3. You can view the files in your repository to confirm they contain the correct data
 
 ## Step 6: Verify Automatic Scheduling
 
@@ -220,8 +247,14 @@ To check when it last ran:
 **"Error: SERVICE_ACCOUNT_JSON environment variable not set"**
 - Make sure you've added the `SERVICE_ACCOUNT_JSON` secret in GitHub Settings
 
-**"Error: DRIVE_FOLDER_ID environment variable not set"**
-- Make sure you've added the `DRIVE_FOLDER_ID` secret in GitHub Settings
+**"Error: DRIVE_FOLDER_ID environment variable not set"** (legacy warning)
+- This is expected if you haven't set the legacy variable
+- The script now uses `DRIVE_FOLDER_ID_<DRIVE_ID>` format (e.g., `DRIVE_FOLDER_ID_TVUS`)
+
+**"Warning: DRIVE_FOLDER_ID_XXX not set, skipping xxx"**
+- Make sure you've added the secret for that specific drive in GitHub Settings
+- Check that the drive ID in the secret name matches the ID in `config.json` (case-insensitive)
+- Ensure you've shared the folder with the service account
 
 **"Error: Failed to list files from Drive API: 404"**
 - Check that the folder ID is correct
@@ -238,7 +271,65 @@ To check when it last ran:
 
 **The workflow runs but doesn't commit changes**
 - This is normal if the folder contents haven't changed since the last run
-- The workflow only commits if `songs.json` has been modified
+- The workflow only commits if any of the song JSON files have been modified
+
+## Adding a New Drive Source
+
+To add a new drive source (e.g., a third ukulele group):
+
+### 1. Update config.json
+
+Add a new entry to the `drives` array in `config.json`:
+
+```json
+{
+  "drives": [
+    {
+      "id": "tvus",
+      "name": "TVUS",
+      "displayName": "TVUS",
+      "outputFile": "songs-tvus.json"
+    },
+    {
+      "id": "gts",
+      "name": "GTS",
+      "displayName": "GTS",
+      "outputFile": "songs-gts.json"
+    },
+    {
+      "id": "newgroup",
+      "name": "NewGroup",
+      "displayName": "New Group",
+      "outputFile": "songs-newgroup.json"
+    }
+  ]
+}
+```
+
+### 2. Add GitHub Secret
+
+Add a new secret `DRIVE_FOLDER_ID_NEWGROUP` with the folder ID for the new group.
+
+### 3. Update GitHub Actions Workflow
+
+Edit `.github/workflows/update-songs.yml` and add the new environment variable:
+
+```yaml
+env:
+  SERVICE_ACCOUNT_JSON: ${{ secrets.SERVICE_ACCOUNT_JSON }}
+  DRIVE_FOLDER_ID_TVUS: ${{ secrets.DRIVE_FOLDER_ID_TVUS }}
+  DRIVE_FOLDER_ID_GTS: ${{ secrets.DRIVE_FOLDER_ID_GTS }}
+  DRIVE_FOLDER_ID_NEWGROUP: ${{ secrets.DRIVE_FOLDER_ID_NEWGROUP }}
+  CONFIG_PATH: config.json
+```
+
+### 4. Share the Folder
+
+Share the Google Drive folder with your service account email (as described in Step 2).
+
+### 5. Test
+
+Run the workflow manually to verify the new drive source is working correctly.
 
 ### Getting Help
 
@@ -259,14 +350,13 @@ If you encounter issues:
 
 ## Updating the Configuration
 
-### Change the Output Path
+### Change a Drive's Output File
 
-By default, the JSON file is saved to `songs.json`. To change this:
+To change where a drive's JSON is saved:
 
-1. Edit `.github/workflows/update-songs.yml`
-2. Find the `OUTPUT_JSON_PATH` environment variable
-3. Change it to your desired path (e.g., `data/songs.json`)
-4. Update your `script.js` to fetch from the new location
+1. Edit `config.json`
+2. Update the `outputFile` field for the drive
+3. Update your `script.js` if necessary (it reads from config.json automatically)
 
 ### Change the Schedule
 
@@ -283,11 +373,12 @@ Examples:
 
 ## Next Steps
 
-Once the workflow is successfully running and generating `songs.json`:
+Once the workflow is successfully running and generating the song JSON files:
 
-1. The songs will automatically appear on the Songs page (songs.html)
-2. The website uses script.js to dynamically load and display songs
-3. Users can search and filter songs using the search bar
-4. Each song has View and Download buttons that link to Google Drive
+1. The songs will automatically appear on the Songs page (songs.html) in their respective tabs
+2. Each drive source will have its own tab (e.g., TVUS, GTS)
+3. The website uses script.js to dynamically load and display songs from config.json
+4. Users can search and filter songs using the search bar within each tab
+5. Each song has View and Download buttons that link to Google Drive
 
-The integration is complete - your website will now automatically sync with your Google Drive folder!
+The integration is complete - your website will now automatically sync with multiple Google Drive folders!
