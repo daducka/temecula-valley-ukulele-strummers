@@ -22,39 +22,110 @@
             <h2>Our Song Collection</h2>
             <p>Here's our collection of songs we love to play together!</p>
             
-            <div class="song-list">
-                <article class="song-item">
-                    <h3>Somewhere Over the Rainbow</h3>
-                    <p class="artist">Israel Kamakawiwo'ole</p>
-                    <p class="difficulty">Difficulty: Beginner</p>
-                </article>
-
-                <article class="song-item">
-                    <h3>Riptide</h3>
-                    <p class="artist">Vance Joy</p>
-                    <p class="difficulty">Difficulty: Beginner</p>
-                </article>
-
-                <article class="song-item">
-                    <h3>I'm Yours</h3>
-                    <p class="artist">Jason Mraz</p>
-                    <p class="difficulty">Difficulty: Beginner</p>
-                </article>
-
-                <article class="song-item">
-                    <h3>Hey Soul Sister</h3>
-                    <p class="artist">Train</p>
-                    <p class="difficulty">Difficulty: Intermediate</p>
-                </article>
-
-                <article class="song-item">
-                    <h3>Can't Help Falling in Love</h3>
-                    <p class="artist">Elvis Presley</p>
-                    <p class="difficulty">Difficulty: Beginner</p>
-                </article>
+            <div id="loading" class="loading">
+                <p>Loading songs...</p>
+            </div>
+            
+            <div id="error" class="error" style="display: none;">
+                <p>Unable to load songs. Please try again later.</p>
+            </div>
+            
+            <div id="song-list" class="song-list">
+                <!-- Songs will be dynamically loaded here -->
             </div>
         </section>
     </main>
+
+    <script>
+        // Fetch and display songs from the JSON file
+        async function loadSongs() {
+            const loadingEl = document.getElementById('loading');
+            const errorEl = document.getElementById('error');
+            const songListEl = document.getElementById('song-list');
+            
+            try {
+                const response = await fetch('public/songs.json');
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                
+                // Hide loading message
+                loadingEl.style.display = 'none';
+                
+                if (!data.songs || data.songs.length === 0) {
+                    songListEl.innerHTML = '<p class="no-songs">No songs available yet. Check back soon!</p>';
+                    return;
+                }
+                
+                // Display songs
+                data.songs.forEach(song => {
+                    const article = document.createElement('article');
+                    article.className = 'song-item';
+                    
+                    const title = document.createElement('h3');
+                    title.textContent = song.name.replace('.pdf', '');
+                    article.appendChild(title);
+                    
+                    const actions = document.createElement('div');
+                    actions.className = 'song-actions';
+                    
+                    const viewLink = document.createElement('a');
+                    viewLink.href = song.viewUrl;
+                    viewLink.textContent = 'View';
+                    viewLink.className = 'btn btn-primary';
+                    viewLink.target = '_blank';
+                    viewLink.rel = 'noopener noreferrer';
+                    actions.appendChild(viewLink);
+                    
+                    const downloadLink = document.createElement('a');
+                    downloadLink.href = song.downloadUrl;
+                    downloadLink.textContent = 'Download';
+                    downloadLink.className = 'btn btn-secondary';
+                    downloadLink.target = '_blank';
+                    downloadLink.rel = 'noopener noreferrer';
+                    actions.appendChild(downloadLink);
+                    
+                    article.appendChild(actions);
+                    
+                    // Add metadata if available
+                    if (song.size) {
+                        const size = document.createElement('p');
+                        size.className = 'song-meta';
+                        size.textContent = `Size: ${formatFileSize(song.size)}`;
+                        article.appendChild(size);
+                    }
+                    
+                    songListEl.appendChild(article);
+                });
+                
+                // Display last updated info
+                if (data.generatedAt) {
+                    const lastUpdated = document.createElement('p');
+                    lastUpdated.className = 'last-updated';
+                    lastUpdated.textContent = `Last updated: ${new Date(data.generatedAt).toLocaleDateString()}`;
+                    songListEl.appendChild(lastUpdated);
+                }
+                
+            } catch (error) {
+                console.error('Error loading songs:', error);
+                loadingEl.style.display = 'none';
+                errorEl.style.display = 'block';
+            }
+        }
+        
+        // Format file size in human-readable format
+        function formatFileSize(bytes) {
+            if (bytes < 1024) return bytes + ' B';
+            if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+            return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+        }
+        
+        // Load songs when the page loads
+        document.addEventListener('DOMContentLoaded', loadSongs);
+    </script>
 
     <footer>
         <p>&copy; 2026 Temecula Valley Ukulele Strummers</p>
