@@ -42,6 +42,7 @@ function displaySongs(songs) {
         const songName = document.createElement('div');
         songName.className = 'song-name';
         songName.textContent = song.name; // Use textContent to prevent XSS
+        songName.title = song.name; // Show full name on hover
         
         const songActions = document.createElement('div');
         songActions.className = 'song-actions';
@@ -112,29 +113,27 @@ function setupTabs() {
 // Setup hamburger menu toggle
 function setupHamburgerMenu() {
     const hamburger = document.querySelector('.hamburger-menu');
-    const menuOverlay = document.getElementById('menu-overlay');
-    const menuClose = document.querySelector('.menu-close');
+    const headerMenu = document.getElementById('header-menu');
     
-    if (hamburger && menuOverlay) {
-        // Open menu
+    if (hamburger && headerMenu) {
+        // Toggle menu on hamburger click
         hamburger.addEventListener('click', function() {
-            menuOverlay.classList.add('active');
-            document.body.style.overflow = 'hidden'; // Prevent scrolling when menu is open
+            const isOpen = headerMenu.classList.contains('open');
+            
+            if (isOpen) {
+                headerMenu.classList.remove('open');
+                hamburger.classList.remove('active');
+            } else {
+                headerMenu.classList.add('open');
+                hamburger.classList.add('active');
+            }
         });
         
-        // Close menu with close button
-        if (menuClose) {
-            menuClose.addEventListener('click', function() {
-                menuOverlay.classList.remove('active');
-                document.body.style.overflow = ''; // Restore scrolling
-            });
-        }
-        
-        // Close menu when clicking overlay background
-        menuOverlay.addEventListener('click', function(e) {
-            if (e.target === menuOverlay) {
-                menuOverlay.classList.remove('active');
-                document.body.style.overflow = ''; // Restore scrolling
+        // Close menu when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!hamburger.contains(e.target) && !headerMenu.contains(e.target)) {
+                headerMenu.classList.remove('open');
+                hamburger.classList.remove('active');
             }
         });
     }
