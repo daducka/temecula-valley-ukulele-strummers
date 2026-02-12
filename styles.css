@@ -220,6 +220,22 @@ body {
     height: 20px;
 }
 
+.dark-mode-toggle .sun-icon {
+    display: block;
+}
+
+.dark-mode-toggle .moon-icon {
+    display: none;
+}
+
+body.dark-mode .dark-mode-toggle .sun-icon {
+    display: none;
+}
+
+body.dark-mode .dark-mode-toggle .moon-icon {
+    display: block;
+}
+
 /* Dark Mode Toggle Container for Landing Page */
 .dark-mode-toggle-container {
     position: absolute;
