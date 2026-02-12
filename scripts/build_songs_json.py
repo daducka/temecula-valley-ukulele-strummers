@@ -140,8 +140,9 @@ def build_songs_json(files: List[Dict[str, Any]], folder_id: str) -> List[Dict[s
         
         # Extract song name without .pdf extension
         name = file['name']
+        # Handle case-insensitive .pdf extension
         if name.lower().endswith('.pdf'):
-            name = name[:-4]
+            name = name[:-4]  # Remove last 4 characters (.pdf or .PDF or .Pdf, etc.)
         
         song = {
             'id': idx,
