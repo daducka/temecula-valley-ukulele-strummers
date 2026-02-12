@@ -139,19 +139,47 @@ function setupHamburgerMenu() {
     }
 }
 
+// Extract Google Drive file ID from URL
+function extractFileId(url) {
+    // Extract ID from URL patterns like:
+    // https://drive.usercontent.google.com/u/0/uc?id={id}&export=download
+    // https://drive.google.com/file/d/{id}/view
+    const match = url.match(/[?&]id=([^&]+)/i) || url.match(/\/d\/([^/]+)\//);
+    return match ? match[1] : null;
+}
+
 // View PDF (opens in new tab)
 function viewPDF(pdfUrl) {
-    // In a real app, this would open the actual PDF
-    window.open(pdfUrl, '_blank');
+    const fileId = extractFileId(pdfUrl);
+    if (fileId) {
+        // Use the view URL format for Google Drive
+        const viewUrl = `https://drive.google.com/file/d/${fileId}/view`;
+        window.open(viewUrl, '_blank');
+    } else {
+        // Fallback to original URL if ID extraction fails
+        window.open(pdfUrl, '_blank');
+    }
 }
 
 // Download PDF
 function downloadPDF(pdfUrl) {
-    // In a real app, this would trigger a download
-    const link = document.createElement('a');
-    link.href = pdfUrl;
-    link.download = pdfUrl.split('/').pop();
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    const fileId = extractFileId(pdfUrl);
+    if (fileId) {
+        // Use the download URL format for Google Drive
+        const downloadUrl = `https://drive.usercontent.google.com/u/0/uc?id=${fileId}&export=download`;
+        const link = document.createElement('a');
+        link.href = downloadUrl;
+        link.download = '';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    } else {
+        // Fallback to original behavior if ID extraction fails
+        const link = document.createElement('a');
+        link.href = pdfUrl;
+        link.download = pdfUrl.split('/').pop();
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
 }
