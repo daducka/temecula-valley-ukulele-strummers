@@ -66,7 +66,7 @@ function displaySongs(songs) {
             <polyline points="7 10 12 15 17 10"></polyline>
             <line x1="12" y1="15" x2="12" y2="3"></line>
         </svg>`;
-        downloadBtn.addEventListener('click', () => downloadPDF(song.pdfUrl));
+        downloadBtn.addEventListener('click', () => downloadPDF(song.pdfUrl, song.name));
         
         // Assemble the song row
         songActions.appendChild(viewBtn);
@@ -144,8 +144,18 @@ function extractFileId(url) {
     // Extract ID from URL patterns like:
     // https://drive.usercontent.google.com/u/0/uc?id={id}&export=download
     // https://drive.google.com/file/d/{id}/view
-    const match = url.match(/[?&]id=([^&]+)/i) || url.match(/\/d\/([^/]+)\//);
+    const match = url.match(/[?&]id=([^&]+)/) || url.match(/\/d\/([^/]+)\//);
     return match ? match[1] : null;
+}
+
+// Helper function to trigger download
+function triggerDownload(url, filename) {
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = filename || '';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
 }
 
 // View PDF (opens in new tab)
@@ -162,24 +172,17 @@ function viewPDF(pdfUrl) {
 }
 
 // Download PDF
-function downloadPDF(pdfUrl) {
+function downloadPDF(pdfUrl, songName) {
     const fileId = extractFileId(pdfUrl);
     if (fileId) {
         // Use the download URL format for Google Drive
         const downloadUrl = `https://drive.usercontent.google.com/u/0/uc?id=${fileId}&export=download`;
-        const link = document.createElement('a');
-        link.href = downloadUrl;
-        link.download = '';
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
+        // Use song name as filename if available, add .pdf extension if not already present
+        const filename = songName ? (songName.endsWith('.pdf') ? songName : `${songName}.pdf`) : '';
+        triggerDownload(downloadUrl, filename);
     } else {
         // Fallback to original behavior if ID extraction fails
-        const link = document.createElement('a');
-        link.href = pdfUrl;
-        link.download = pdfUrl.split('/').pop();
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
+        const filename = pdfUrl.split('/').pop();
+        triggerDownload(pdfUrl, filename);
     }
 }
