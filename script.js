@@ -6,9 +6,15 @@ let songsByDrive = {};
 
 // Initialize when DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
-    loadConfig();
-    setupSearch();
-    setupHamburgerMenu();
+    initializeDarkMode();
+    setupDarkModeToggle();
+    
+    // Only run these if we're on the songs page
+    if (document.getElementById('song-list')) {
+        loadConfig();
+        setupSearch();
+        setupHamburgerMenu();
+    }
 });
 
 // Load configuration and initialize
@@ -257,5 +263,24 @@ function downloadPDF(pdfUrl, songName) {
         // Fallback to original behavior if ID extraction fails
         const filename = pdfUrl.split('/').pop();
         triggerDownload(pdfUrl, filename);
+    }
+}
+
+// Dark mode functionality
+function initializeDarkMode() {
+    // Check for saved dark mode preference
+    const isDarkMode = localStorage.getItem('darkMode') === 'true';
+    if (isDarkMode) {
+        document.body.classList.add('dark-mode');
+    }
+}
+
+function setupDarkModeToggle() {
+    const darkModeToggle = document.querySelector('.dark-mode-toggle');
+    if (darkModeToggle) {
+        darkModeToggle.addEventListener('click', function() {
+            const isDarkMode = document.body.classList.toggle('dark-mode');
+            localStorage.setItem('darkMode', isDarkMode);
+        });
     }
 }
