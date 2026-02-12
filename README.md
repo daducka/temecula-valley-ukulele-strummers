@@ -19,7 +19,8 @@ For detailed setup instructions, see [SETUP.md](SETUP.md).
 
 1. Clone the repository
 2. Open `index.html` in a web browser to view the site locally
-3. The `public/songs.json` file contains sample data for development
+3. The `songs.json` file contains sample data for development
+4. The `script.js` file handles dynamic loading and display of songs
 
 ## Updating Songs
 
@@ -31,8 +32,10 @@ Songs are automatically updated daily at midnight UTC. You can also:
 ## Structure
 
 - `index.html` - Home page
-- `songs.html` - Dynamic song list page
+- `songs.html` - Dynamic song list page with search and tabs
+- `script.js` - JavaScript for loading and displaying songs dynamically
 - `styles.css` - Stylesheet
-- `public/songs.json` - Generated list of songs from Google Drive
+- `songs.json` - Generated list of songs from Google Drive
 - `scripts/build_songs_json.py` - Python script to fetch songs from Google Drive
 - `.github/workflows/update-songs.yml` - GitHub Actions workflow
+- `screenshots/` - Website screenshots

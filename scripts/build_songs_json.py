@@ -24,7 +24,7 @@ except ImportError as e:
 
 
 # Configuration
-DEFAULT_OUTPUT_PATH = "public/songs.json"
+DEFAULT_OUTPUT_PATH = "songs.json"
 SCOPES = ['https://www.googleapis.com/auth/drive.readonly']
 
 
@@ -106,71 +106,66 @@ def list_files_in_folder(service, folder_id: str) -> List[Dict[str, Any]]:
         sys.exit(1)
 
 
-def generate_file_urls(file_id: str) -> Dict[str, str]:
+def generate_file_urls(file_id: str) -> str:
     """
-    Generate view and download URLs for a Google Drive file.
+    Generate view URL for a Google Drive file.
+    The same URL works for both viewing and downloading in the browser.
     
     Args:
         file_id: Google Drive file ID
         
     Returns:
-        Dictionary with viewUrl and downloadUrl
+        String with the view URL
     """
-    return {
-        'viewUrl': f'https://drive.google.com/file/d/{file_id}/view?usp=sharing',
-        'downloadUrl': f'https://drive.google.com/uc?export=download&id={file_id}'
-    }
+    return f'https://drive.google.com/file/d/{file_id}/view?usp=sharing'
 
 
-def build_songs_json(files: List[Dict[str, Any]], folder_id: str) -> Dict[str, Any]:
+def build_songs_json(files: List[Dict[str, Any]], folder_id: str) -> List[Dict[str, Any]]:
     """
     Build the songs.json structure from file list.
+    Output format matches the existing script.js expectations.
     
     Args:
         files: List of file metadata from Drive API
         folder_id: The folder ID being processed
         
     Returns:
-        Dictionary ready for JSON serialization
+        List of song dictionaries ready for JSON serialization
     """
     songs = []
     
-    for file in files:
+    for idx, file in enumerate(files, start=1):
         file_id = file['id']
-        urls = generate_file_urls(file_id)
+        pdf_url = generate_file_urls(file_id)
+        
+        # Extract song name without .pdf extension
+        name = file['name']
+        if name.lower().endswith('.pdf'):
+            name = name[:-4]
         
         song = {
-            'id': file_id,
-            'name': file['name'],
-            'mimeType': file.get('mimeType', 'application/pdf'),
-            'modifiedTime': file.get('modifiedTime', ''),
-            'size': int(file.get('size', 0)) if file.get('size') else None,
-            'viewUrl': urls['viewUrl'],
-            'downloadUrl': urls['downloadUrl']
+            'id': idx,
+            'name': name,
+            'pdfUrl': pdf_url
         }
         songs.append(song)
     
     # Sort by name (case-insensitive) for deterministic output
     songs.sort(key=lambda x: x['name'].lower())
     
-    # Build final structure
-    result = {
-        'generatedAt': datetime.utcnow().isoformat() + 'Z',
-        'source': {
-            'folderId': folder_id
-        },
-        'songs': songs
-    }
+    # Re-number IDs after sorting
+    for idx, song in enumerate(songs, start=1):
+        song['id'] = idx
     
-    return result
+    return songs
 
 
-def write_json_file(data: Dict[str, Any], output_path: str):
+def write_json_file(data: List[Dict[str, Any]], output_path: str):
     """
     Write the songs data to a JSON file with pretty formatting.
     
     Args:
-        data: Dictionary to serialize
+        data: List of songs to serialize
         output_path: Path where the JSON file should be written
     """
     # Ensure directory exists
@@ -180,7 +175,7 @@ def write_json_file(data: Dict[str, Any], output_path: str):
         with open(output_path, 'w', encoding='utf-8') as f:
             json.dump(data, f, indent=2, ensure_ascii=False)
             f.write('\n')  # Add trailing newline
-        print(f"✓ Successfully wrote {len(data['songs'])} song(s) to {output_path}")
+        print(f"✓ Successfully wrote {len(data)} song(s) to {output_path}")
     except Exception as e:
         print(f"Error: Failed to write JSON file: {e}", file=sys.stderr)
         sys.exit(1)

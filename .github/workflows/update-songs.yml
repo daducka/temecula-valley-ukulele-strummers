@@ -33,21 +33,21 @@ jobs:
         env:
           SERVICE_ACCOUNT_JSON: ${{ secrets.SERVICE_ACCOUNT_JSON }}
           DRIVE_FOLDER_ID: ${{ secrets.DRIVE_FOLDER_ID }}
-          OUTPUT_JSON_PATH: public/songs.json
+          OUTPUT_JSON_PATH: songs.json
         run: |
           python scripts/build_songs_json.py
       
       - name: Check for changes
         id: git-check
         run: |
-          git diff --exit-code public/songs.json || echo "changed=true" >> $GITHUB_OUTPUT
+          git diff --exit-code songs.json || echo "changed=true" >> $GITHUB_OUTPUT
       
       - name: Commit and push changes
         if: steps.git-check.outputs.changed == 'true'
         run: |
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
-          git add public/songs.json
+          git add songs.json
           git commit -m "Update songs.json from Google Drive"
           git push
       

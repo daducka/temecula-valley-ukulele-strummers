@@ -142,14 +142,14 @@ pip install -r requirements.txt
 ```bash
 export SERVICE_ACCOUNT_JSON='<paste the entire JSON content here>'
 export DRIVE_FOLDER_ID='<your-folder-id>'
-export OUTPUT_JSON_PATH='public/songs.json'
+export OUTPUT_JSON_PATH='songs.json'
 ```
 
 **On Windows (PowerShell):**
 ```powershell
 $env:SERVICE_ACCOUNT_JSON='<paste the entire JSON content here>'
 $env:DRIVE_FOLDER_ID='<your-folder-id>'
-$env:OUTPUT_JSON_PATH='public/songs.json'
+$env:OUTPUT_JSON_PATH='songs.json'
 ```
 
 ### 4.3 Run the Script
@@ -163,20 +163,20 @@ If successful, you should see output like:
 ============================================================
 Building songs.json from Google Drive
 ============================================================
-Output path: public/songs.json
+Output path: songs.json
 
 ✓ Successfully loaded service account credentials
 ✓ Successfully connected to Google Drive API
 Querying folder: 1a2B3c4D5e6F7g8H9i0J1k2L3m4N5o6P
 ✓ Found 15 file(s)
-✓ Successfully wrote 15 song(s) to public/songs.json
+✓ Successfully wrote 15 song(s) to songs.json
 
 ============================================================
 ✓ Successfully completed!
 ============================================================
 ```
 
-Check the `public/songs.json` file to verify it contains your songs.
+Check the `songs.json` file to verify it contains your songs.
 
 ## Step 5: Trigger the GitHub Actions Workflow Manually
 
@@ -202,7 +202,7 @@ Now that everything is configured, test the workflow on GitHub.
 
 If the workflow succeeds:
 1. A new commit will be made to your repository with the message "Update songs.json from Google Drive"
-2. The `public/songs.json` file will be created or updated
+2. The `songs.json` file will be created or updated
 3. You can view the file in your repository to confirm it contains the correct data
 
 ## Step 6: Verify Automatic Scheduling
@@ -238,7 +238,7 @@ To check when it last ran:
 
 **The workflow runs but doesn't commit changes**
 - This is normal if the folder contents haven't changed since the last run
-- The workflow only commits if `public/songs.json` has been modified
+- The workflow only commits if `songs.json` has been modified
 
 ### Getting Help
 
@@ -261,12 +261,12 @@ If you encounter issues:
 
 ### Change the Output Path
 
-By default, the JSON file is saved to `public/songs.json`. To change this:
+By default, the JSON file is saved to `songs.json`. To change this:
 
 1. Edit `.github/workflows/update-songs.yml`
 2. Find the `OUTPUT_JSON_PATH` environment variable
 3. Change it to your desired path (e.g., `data/songs.json`)
-4. Update your website code to fetch from the new location
+4. Update your `script.js` to fetch from the new location
 
 ### Change the Schedule
 
@@ -283,11 +283,11 @@ Examples:
 
 ## Next Steps
 
-Once the workflow is successfully running and generating `public/songs.json`:
+Once the workflow is successfully running and generating `songs.json`:
 
-1. Update your `songs.html` page to fetch and display songs from the JSON file
-2. Consider adding JavaScript to dynamically render the song list
-3. Add styling to make the song cards visually appealing
-4. Optionally add filtering/search functionality
+1. The songs will automatically appear on the Songs page (songs.html)
+2. The website uses script.js to dynamically load and display songs
+3. Users can search and filter songs using the search bar
+4. Each song has View and Download buttons that link to Google Drive
 
-See the website implementation for examples of how to use the generated JSON data.
+The integration is complete - your website will now automatically sync with your Google Drive folder!
