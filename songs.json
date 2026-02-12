@@ -1,0 +1,68 @@
+[
+  {
+    "id": 1,
+    "name": "It's The End Of The World As We Know It (And I Feel Fine)",
+    "artist": "R.E.M.",
+    "pdfUrl": "songs/end-of-the-world.pdf"
+  },
+  {
+    "id": 2,
+    "name": "Somewhere Over the Rainbow",
+    "artist": "Israel Kamakawiwo'ole",
+    "pdfUrl": "songs/somewhere-over-the-rainbow.pdf"
+  },
+  {
+    "id": 3,
+    "name": "Riptide",
+    "artist": "Vance Joy",
+    "pdfUrl": "songs/riptide.pdf"
+  },
+  {
+    "id": 4,
+    "name": "I'm Yours",
+    "artist": "Jason Mraz",
+    "pdfUrl": "songs/im-yours.pdf"
+  },
+  {
+    "id": 5,
+    "name": "Hey Soul Sister",
+    "artist": "Train",
+    "pdfUrl": "songs/hey-soul-sister.pdf"
+  },
+  {
+    "id": 6,
+    "name": "Can't Help Falling in Love",
+    "artist": "Elvis Presley",
+    "pdfUrl": "songs/cant-help-falling-in-love.pdf"
+  },
+  {
+    "id": 7,
+    "name": "Count on Me",
+    "artist": "Bruno Mars",
+    "pdfUrl": "songs/count-on-me.pdf"
+  },
+  {
+    "id": 8,
+    "name": "Three Little Birds",
+    "artist": "Bob Marley",
+    "pdfUrl": "songs/three-little-birds.pdf"
+  },
+  {
+    "id": 9,
+    "name": "Don't Worry Be Happy",
+    "artist": "Bobby McFerrin",
+    "pdfUrl": "songs/dont-worry-be-happy.pdf"
+  },
+  {
+    "id": 10,
+    "name": "Stand By Me",
+    "artist": "Ben E. King",
+    "pdfUrl": "songs/stand-by-me.pdf"
+  },
+  {
+    "id": 11,
+    "name": "What a Wonderful World",
+    "artist": "Louis Armstrong",
+    "pdfUrl": "songs/what-a-wonderful-world.pdf"
+  }
+]
