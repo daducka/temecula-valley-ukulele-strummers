@@ -7,10 +7,14 @@ let songsByDrive = {};
 // Initialize when DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
     initializeDarkMode();
-    loadConfig();
-    setupSearch();
-    setupHamburgerMenu();
     setupDarkModeToggle();
+    
+    // Only run these if we're on the songs page
+    if (document.getElementById('song-list')) {
+        loadConfig();
+        setupSearch();
+        setupHamburgerMenu();
+    }
 });
 
 // Load configuration and initialize
