@@ -5,6 +5,8 @@ Build songs.json from Google Drive folder contents.
 This script authenticates with Google Drive API using a service account,
 lists PDF files in a specified folder, and generates a JSON file with
 metadata and download links.
+
+Supports multiple drive folders via config.json.
 """
 
 import json
@@ -25,6 +27,7 @@ except ImportError as e:
 
 # Configuration
 DEFAULT_OUTPUT_PATH = "songs.json"
+DEFAULT_CONFIG_PATH = "config.json"
 SCOPES = ['https://www.googleapis.com/auth/drive.readonly']
 
 
@@ -182,22 +185,75 @@ def write_json_file(data: List[Dict[str, Any]], output_path: str):
         sys.exit(1)
 
 
+def load_config(config_path: str) -> Dict[str, Any]:
+    """
+    Load drive configuration from config.json.
+    
+    Args:
+        config_path: Path to the config file
+        
+    Returns:
+        Dictionary containing configuration data
+    """
+    try:
+        with open(config_path, 'r', encoding='utf-8') as f:
+            config = json.load(f)
+        print(f"✓ Loaded configuration from {config_path}")
+        return config
+    except FileNotFoundError:
+        print(f"Error: Config file not found: {config_path}", file=sys.stderr)
+        sys.exit(1)
+    except json.JSONDecodeError as e:
+        print(f"Error: Invalid JSON in config file: {e}", file=sys.stderr)
+        sys.exit(1)
+
+
+def process_single_drive(service, drive_config: Dict[str, Any], folder_id: str):
+    """
+    Process a single drive configuration.
+    
+    Args:
+        service: Authenticated Google Drive API service
+        drive_config: Drive configuration from config.json
+        folder_id: The Google Drive folder ID
+    """
+    drive_id = drive_config.get('id', 'unknown')
+    drive_name = drive_config.get('name', 'Unknown')
+    output_file = drive_config.get('outputFile', f'songs-{drive_id}.json')
+    
+    print(f"\nProcessing drive: {drive_name} ({drive_id})")
+    print(f"  Folder ID: {folder_id}")
+    print(f"  Output file: {output_file}")
+    
+    # List files
+    files = list_files_in_folder(service, folder_id)
+    
+    if not files:
+        print(f"  Warning: No PDF files found in folder for {drive_name}", file=sys.stderr)
+    
+    # Build JSON structure
+    data = build_songs_json(files, folder_id)
+    
+    # Write to file
+    write_json_file(data, output_file)
+
+
 def main():
     """Main execution function."""
     print("=" * 60)
-    print("Building songs.json from Google Drive")
+    print("Building songs JSON files from Google Drive")
     print("=" * 60)
     
-    # Get configuration from environment
-    folder_id = os.environ.get('DRIVE_FOLDER_ID')
-    if not folder_id:
-        print("Error: DRIVE_FOLDER_ID environment variable not set", file=sys.stderr)
+    # Load configuration
+    config_path = os.environ.get('CONFIG_PATH', DEFAULT_CONFIG_PATH)
+    config = load_config(config_path)
+    
+    drives = config.get('drives', [])
+    if not drives:
+        print("Error: No drives configured in config.json", file=sys.stderr)
         sys.exit(1)
     
-    output_path = os.environ.get('OUTPUT_JSON_PATH', DEFAULT_OUTPUT_PATH)
-    
-    print(f"Output path: {output_path}")
-    print()
+    print(f"Found {len(drives)} drive(s) to process")
     
     # Authenticate and build service
     credentials = get_credentials()
@@ -209,17 +265,31 @@ def main():
         print(f"Error: Failed to build Drive service: {e}", file=sys.stderr)
         sys.exit(1)
     
-    # List files
-    files = list_files_in_folder(service, folder_id)
+    # Process each drive
+    for drive_config in drives:
+        drive_id = drive_config.get('id', 'unknown')
+        # Get folder ID from environment variable based on drive ID
+        env_var_name = f'DRIVE_FOLDER_ID_{drive_id.upper()}'
+        folder_id = os.environ.get(env_var_name)
+        
+        if not folder_id:
+            print(f"Warning: {env_var_name} not set, skipping {drive_id}", file=sys.stderr)
+            continue
+        
+        try:
+            process_single_drive(service, drive_config, folder_id)
+        except Exception as e:
+            print(f"Error processing {drive_id}: {e}", file=sys.stderr)
+            # Continue with other drives instead of exiting
     
-    if not files:
-        print("Warning: No PDF files found in the folder", file=sys.stderr)
-    
-    # Build JSON structure
-    data = build_songs_json(files, folder_id)
-    
-    # Write to file
-    write_json_file(data, output_path)
+    # Also handle legacy DRIVE_FOLDER_ID for backward compatibility
+    legacy_folder_id = os.environ.get('DRIVE_FOLDER_ID')
+    if legacy_folder_id:
+        print("\n⚠ Legacy DRIVE_FOLDER_ID detected - generating songs.json for backward compatibility")
+        output_path = os.environ.get('OUTPUT_JSON_PATH', DEFAULT_OUTPUT_PATH)
+        files = list_files_in_folder(service, legacy_folder_id)
+        data = build_songs_json(files, legacy_folder_id)
+        write_json_file(data, output_path)
     
     print()
     print("=" * 60)

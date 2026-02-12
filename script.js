@@ -1,25 +1,92 @@
 // Load and display songs from JSON
 let allSongs = [];
-let currentTab = 'songs-1';
+let currentTab = null;
+let driveConfigs = [];
+let songsByDrive = {};
 
 // Initialize when DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
-    loadSongs();
+    loadConfig();
     setupSearch();
-    setupTabs();
     setupHamburgerMenu();
 });
 
-// Load songs from JSON file
-async function loadSongs() {
+// Load configuration and initialize
+async function loadConfig() {
     try {
-        const response = await fetch('songs.json');
-        allSongs = await response.json();
-        displaySongs(allSongs);
+        const response = await fetch('config.json');
+        const config = await response.json();
+        driveConfigs = config.drives || [];
+        
+        if (driveConfigs.length === 0) {
+            console.error('No drives configured');
+            document.getElementById('song-list').innerHTML = '<p class="error">No drives configured. Please check configuration.</p>';
+            return;
+        }
+        
+        // Set current tab to first drive
+        currentTab = driveConfigs[0].id;
+        
+        // Create tabs dynamically
+        createTabs();
+        
+        // Load songs for all drives
+        await loadAllSongs();
+        
+        // Display songs for the active tab
+        displaySongsForCurrentTab();
+        
+        // Setup tabs after creation
+        setupTabs();
     } catch (error) {
-        console.error('Error loading songs:', error);
-        document.getElementById('song-list').innerHTML = '<p class="error">Error loading songs. Please try again later.</p>';
+        console.error('Error loading config:', error);
+        document.getElementById('song-list').innerHTML = '<p class="error">Error loading configuration. Please try again later.</p>';
     }
+}
+
+// Create tabs from config
+function createTabs() {
+    const tabsContainer = document.getElementById('tabs-container');
+    if (!tabsContainer) return;
+    
+    tabsContainer.innerHTML = '';
+    
+    driveConfigs.forEach((drive, index) => {
+        const button = document.createElement('button');
+        button.className = 'tab-btn';
+        button.dataset.tab = drive.id;
+        button.textContent = drive.displayName || drive.name;
+        
+        // First tab is active by default
+        if (index === 0) {
+            button.classList.add('active');
+        }
+        
+        tabsContainer.appendChild(button);
+    });
+}
+
+// Load songs from all drive sources
+async function loadAllSongs() {
+    const loadPromises = driveConfigs.map(async (drive) => {
+        try {
+            const response = await fetch(drive.outputFile);
+            const songs = await response.json();
+            songsByDrive[drive.id] = songs;
+            console.log(`Loaded ${songs.length} songs for ${drive.name}`);
+        } catch (error) {
+            console.error(`Error loading songs for ${drive.name}:`, error);
+            songsByDrive[drive.id] = [];
+        }
+    });
+    
+    await Promise.all(loadPromises);
+}
+
+// Display songs for the current tab
+function displaySongsForCurrentTab() {
+    allSongs = songsByDrive[currentTab] || [];
+    displaySongs(allSongs);
 }
 
 // Display songs in the list
@@ -83,7 +150,8 @@ function setupSearch() {
     if (searchInput) {
         searchInput.addEventListener('input', function(e) {
             const searchTerm = e.target.value.toLowerCase();
-            const filteredSongs = allSongs.filter(song => 
+            const currentSongs = songsByDrive[currentTab] || [];
+            const filteredSongs = currentSongs.filter(song => 
                 song.name.toLowerCase().includes(searchTerm) ||
                 (song.artist && song.artist.toLowerCase().includes(searchTerm))
             );
@@ -103,9 +171,14 @@ function setupTabs() {
             this.classList.add('active');
             currentTab = this.dataset.tab;
             
-            // For now, both tabs show the same songs
-            // In a real app, you might filter songs based on tab
-            displaySongs(allSongs);
+            // Clear search input
+            const searchInput = document.getElementById('search-input');
+            if (searchInput) {
+                searchInput.value = '';
+            }
+            
+            // Display songs for the new tab
+            displaySongsForCurrentTab();
         });
     });
 }

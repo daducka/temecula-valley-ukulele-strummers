@@ -1,0 +1,16 @@
+{
+  "drives": [
+    {
+      "id": "tvus",
+      "name": "TVUS",
+      "displayName": "TVUS",
+      "outputFile": "songs-tvus.json"
+    },
+    {
+      "id": "gts",
+      "name": "GTS",
+      "displayName": "GTS",
+      "outputFile": "songs-gts.json"
+    }
+  ]
+}
