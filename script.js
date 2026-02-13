@@ -11,12 +11,12 @@ let filteredSongs = [];
 document.addEventListener('DOMContentLoaded', function() {
     initializeDarkMode();
     setupDarkModeToggle();
+    setupHamburgerMenu();
     
     // Only run these if we're on the songs page
     if (document.getElementById('song-list')) {
         loadConfig();
         setupSearch();
-        setupHamburgerMenu();
     }
 });
 
