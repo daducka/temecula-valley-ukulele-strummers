@@ -197,7 +197,8 @@ body {
 
 .header-logo .ukulele-logo {
     height: 50px;
-    width: auto;
+    width: 50px;
+    object-fit: contain;
 }
 
 .social-icons {
@@ -536,8 +537,9 @@ body.dark-mode .dark-mode-toggle .moon-icon {
     }
 
     .header-logo .ukulele-logo {
-        height: 35px;
-        max-width: 40%;
+        height: 40px;
+        width: 40px;
+        object-fit: contain;
     }
 
     .social-icons {
@@ -651,6 +653,7 @@ body.dark-mode .dark-mode-toggle .moon-icon {
 
 @media (max-width: 480px) {
     .header-logo .ukulele-logo {
-        height: 35px;
+        height: 40px;
+        width: 40px;
     }
 }
