@@ -10,11 +10,13 @@ The implementation is complete except for the actual logo images. Here's how to 
    ```
 
 2. **Save the three logo images to the `images/` folder:**
-   - Download `title-text.png` from: https://github.com/user-attachments/assets/273ca198-a660-4037-8f7a-b7d8b9f0239f
-   - Download `big-logo.png` from: https://github.com/user-attachments/assets/e64b65c8-1777-4328-b064-e92f20e038ce
-   - Download `ukulele-icon.png` from: https://github.com/user-attachments/assets/ad6d621c-0762-484a-ae35-e56412204830
    
-   Save them to: `images/title-text.png`, `images/big-logo.png`, `images/ukulele-icon.png`
+   You'll need to obtain the three logo files from the project owner or design assets:
+   - `title-text.png` - Curved "Temecula Valley Ukulele Strummers" text with musical notes
+   - `big-logo.png` - Full logo with curved text, TVUS text, and detailed ukulele
+   - `ukulele-icon.png` - Isolated dark blue ukulele in horizontal orientation
+   
+   Save them to the `images/` folder in the repository root.
 
 3. **Add and commit the changes:**
    ```bash

@@ -6,6 +6,11 @@
 }
 
 :root {
+    /* Brand colors (consistent across modes) */
+    --brand-blue: #5573A3;
+    --brand-blue-dark: #4a6390;
+    --brand-accent: #000066;
+    
     /* Light mode colors */
     --bg-primary: #ffffff;
     --bg-secondary: #f8f9fa;
@@ -19,6 +24,8 @@
     --primary-color: #5573A3;
     --primary-hover: #4a6390;
     --accent-dark-blue: #000066;
+    --header-icon-color: #ffffff;
+    --header-icon-hover: rgba(255, 255, 255, 0.8);
     --disabled-bg: #f0f0f0;
     --disabled-text: #999;
     --disabled-border: #ddd;
@@ -137,7 +144,7 @@ body {
 
 /* Header */
 .songs-header {
-    background-color: #5573A3;
+    background-color: var(--brand-blue);
     border-bottom: 1px solid var(--border-color);
     position: relative;
 }
@@ -154,18 +161,18 @@ body {
     border: none;
     cursor: pointer;
     padding: 0.5rem;
-    color: #ffffff;
+    color: var(--header-icon-color);
     display: flex;
     align-items: center;
     transition: color 0.3s ease, transform 0.3s ease;
 }
 
 .hamburger-menu:hover {
-    color: rgba(255, 255, 255, 0.8);
+    color: var(--header-icon-hover);
 }
 
 .hamburger-menu.active {
-    color: rgba(255, 255, 255, 0.8);
+    color: var(--header-icon-hover);
     transform: rotate(90deg);
 }
 
@@ -197,7 +204,7 @@ body {
 }
 
 .social-icon {
-    color: #ffffff;
+    color: var(--header-icon-color);
     display: flex;
     align-items: center;
     text-decoration: none;
@@ -205,7 +212,7 @@ body {
 }
 
 .social-icon:hover {
-    color: rgba(255, 255, 255, 0.8);
+    color: var(--header-icon-hover);
 }
 
 /* Dark Mode Toggle */
@@ -214,7 +221,7 @@ body {
     border: none;
     cursor: pointer;
     padding: 0.5rem;
-    color: #ffffff;
+    color: var(--header-icon-color);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -223,11 +230,11 @@ body {
 }
 
 .songs-header .dark-mode-toggle {
-    color: #ffffff;
+    color: var(--header-icon-color);
 }
 
 .songs-header .dark-mode-toggle:hover {
-    color: rgba(255, 255, 255, 0.8);
+    color: var(--header-icon-hover);
     transform: scale(1.1);
 }
 
