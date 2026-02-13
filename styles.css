@@ -179,22 +179,25 @@ body {
 .header-logo {
     flex: 1;
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-start;
     align-items: center;
-    gap: 1rem;
     padding: 0 1rem;
 }
 
-.header-logo .title-logo {
-    height: 50px;
-    width: auto;
-    max-width: 60%;
+.header-logo .logo-link {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    transition: transform 0.3s ease;
+}
+
+.header-logo .logo-link:hover {
+    transform: scale(1.05);
 }
 
 .header-logo .ukulele-logo {
     height: 50px;
     width: auto;
-    max-width: 35%;
 }
 
 .social-icons {
@@ -600,5 +603,54 @@ body.dark-mode .dark-mode-toggle .moon-icon {
     
     .pagination-info {
         font-size: 0.85rem;
+    }
+}
+
+/* ===== CONTENT PAGE STYLES ===== */
+.content-page {
+    background-color: var(--bg-primary);
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.content-main {
+    flex: 1;
+    max-width: 800px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 3rem 1.5rem;
+    text-align: center;
+}
+
+.content-main h1 {
+    font-size: 2.5rem;
+    color: var(--primary-color);
+    margin-bottom: 1.5rem;
+    font-weight: 600;
+}
+
+.content-main p {
+    font-size: 1.2rem;
+    color: var(--text-secondary);
+}
+
+@media (max-width: 768px) {
+    .content-main {
+        padding: 2rem 1.5rem;
+    }
+    
+    .content-main h1 {
+        font-size: 2rem;
+    }
+    
+    .content-main p {
+        font-size: 1.1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .header-logo .ukulele-logo {
+        height: 35px;
     }
 }
