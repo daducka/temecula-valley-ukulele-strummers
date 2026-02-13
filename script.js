@@ -4,7 +4,7 @@ let currentTab = null;
 let driveConfigs = [];
 let songsByDrive = {};
 let currentPage = 1;
-let itemsPerPage = 20;
+let itemsPerPage = 10;
 let filteredSongs = [];
 
 // Initialize when DOM is loaded
@@ -170,22 +170,8 @@ function displaySongs(songs) {
     renderPagination(songs.length);
 }
 
-// Render pagination controls
-function renderPagination(totalItems) {
-    const totalPages = Math.ceil(totalItems / itemsPerPage);
-    
-    // Remove existing pagination if it exists
-    const existingPagination = document.querySelector('.pagination-container');
-    if (existingPagination) {
-        existingPagination.remove();
-    }
-    
-    // Don't show pagination if only one page
-    if (totalPages <= 1) {
-        return;
-    }
-    
-    const songList = document.getElementById('song-list');
+// Helper function to create pagination controls
+function createPaginationControls(totalPages) {
     const paginationContainer = document.createElement('div');
     paginationContainer.className = 'pagination-container';
     
@@ -221,7 +207,31 @@ function renderPagination(totalItems) {
     });
     paginationContainer.appendChild(nextBtn);
     
-    songList.appendChild(paginationContainer);
+    return paginationContainer;
+}
+
+// Render pagination controls
+function renderPagination(totalItems) {
+    const totalPages = Math.ceil(totalItems / itemsPerPage);
+    
+    // Remove existing pagination if it exists
+    const existingPagination = document.querySelectorAll('.pagination-container');
+    existingPagination.forEach(el => el.remove());
+    
+    // Don't show pagination if only one page
+    if (totalPages <= 1) {
+        return;
+    }
+    
+    const songList = document.getElementById('song-list');
+    
+    // Add pagination at the top
+    const topPagination = createPaginationControls(totalPages);
+    songList.insertBefore(topPagination, songList.firstChild);
+    
+    // Add pagination at the bottom
+    const bottomPagination = createPaginationControls(totalPages);
+    songList.appendChild(bottomPagination);
 }
 
 // Setup search functionality
