@@ -197,7 +197,8 @@ body {
 
 .header-logo .ukulele-logo {
     height: 50px;
-    width: auto;
+    width: 50px;
+    object-fit: contain;
 }
 
 .social-icons {
