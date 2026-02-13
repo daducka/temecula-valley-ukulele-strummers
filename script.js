@@ -280,7 +280,8 @@ function setupHamburgerMenu() {
     
     if (hamburger && headerMenu) {
         // Toggle menu on hamburger click
-        hamburger.addEventListener('click', function() {
+        hamburger.addEventListener('click', function(e) {
+            e.stopPropagation(); // Prevent event from bubbling to document
             const isOpen = headerMenu.classList.contains('open');
             
             if (isOpen) {
