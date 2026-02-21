@@ -79,9 +79,11 @@ body {
 }
 
 .main-logo {
-    max-width: 100%;
+    max-width: 500px;
+    width: 100%;
     height: auto;
     border-radius: 8px;
+    background-color: var(--brand-blue);
 }
 
 .nav-grid {
