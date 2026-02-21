@@ -646,6 +646,14 @@ body.dark-mode .dark-mode-toggle .moon-icon {
     color: var(--text-secondary);
 }
 
+.calendar-embed {
+    width: 100%;
+    max-width: 100%;
+    border: none;
+    margin-top: 1rem;
+    color-scheme: normal;
+}
+
 @media (max-width: 768px) {
     .content-main {
         padding: 2rem 1.5rem;
