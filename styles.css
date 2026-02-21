@@ -87,6 +87,7 @@ body {
 .nav-grid {
     display: grid;
     grid-template-columns: repeat(2, 200px);
+    grid-template-rows: repeat(2, 80px);
     gap: 1.5rem;
     margin-bottom: 3rem;
 }
