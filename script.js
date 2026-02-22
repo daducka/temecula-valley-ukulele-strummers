@@ -157,10 +157,25 @@ function displaySongs(songs) {
             <line x1="12" y1="15" x2="12" y2="3"></line>
         </svg>`;
         downloadBtn.addEventListener('click', () => downloadPDF(song.pdfUrl, song.name));
+
+        // Create GoodReader button
+        const goodReaderBtn = document.createElement('button');
+        goodReaderBtn.className = 'icon-btn goodreader-btn';
+        goodReaderBtn.title = 'Open in GoodReader';
+
+        const grImg = document.createElement('img');
+        grImg.src = 'images/gr-logo.svg';
+        grImg.alt = 'Open in GoodReader';
+        grImg.width = 20;
+        grImg.height = 20;
+
+        goodReaderBtn.appendChild(grImg);
+        goodReaderBtn.addEventListener('click', () => openInGoodReader(song.pdfUrl));
         
         // Assemble the song row
         songActions.appendChild(viewBtn);
         songActions.appendChild(downloadBtn);
+        songActions.appendChild(goodReaderBtn);
         songRow.appendChild(songName);
         songRow.appendChild(songActions);
         songList.appendChild(songRow);
@@ -349,6 +364,35 @@ function downloadPDF(pdfUrl, songName) {
         const filename = pdfUrl.split('/').pop();
         triggerDownload(pdfUrl, filename);
     }
+}
+
+// Open PDF in GoodReader app, with fallback to direct download URL
+function openInGoodReader(pdfUrl) {
+    const fileId = extractFileId(pdfUrl);
+
+    const directUrl = fileId
+        ? `https://drive.usercontent.google.com/u/0/uc?id=${fileId}&export=download`
+        : pdfUrl;
+
+    const deepLink = `gropen://${directUrl}`;
+
+    // Attempt to open GoodReader
+    window.location.href = deepLink;
+
+    // Fallback if app not installed: cancel if GoodReader takes focus (page becomes hidden)
+    let fallbackTimer = setTimeout(() => {
+        document.removeEventListener('visibilitychange', cancelFallback);
+        window.open(directUrl, '_blank');
+    }, 900);
+
+    function cancelFallback() {
+        if (document.hidden) {
+            clearTimeout(fallbackTimer);
+            document.removeEventListener('visibilitychange', cancelFallback);
+        }
+    }
+
+    document.addEventListener('visibilitychange', cancelFallback);
 }
 
 // Dark mode functionality
