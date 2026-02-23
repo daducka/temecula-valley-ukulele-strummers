@@ -322,16 +322,16 @@ function triggerDownload(url, filename) {
     document.body.removeChild(link);
 }
 
-// View PDF (opens in new tab)
+// View PDF (opens in same tab)
 function viewPDF(pdfUrl) {
     const fileId = extractFileId(pdfUrl);
     if (fileId) {
         // Use the view URL format for Google Drive
         const viewUrl = `https://drive.google.com/file/d/${fileId}/view`;
-        window.open(viewUrl, '_blank');
+        window.open(viewUrl, '_self'); 
     } else {
         // Fallback to original URL if ID extraction fails
-        window.open(pdfUrl, '_blank');
+        window.open(pdfUrl, '_self');
     }
 }
 
