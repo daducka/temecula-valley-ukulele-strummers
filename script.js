@@ -157,25 +157,10 @@ function displaySongs(songs) {
             <line x1="12" y1="15" x2="12" y2="3"></line>
         </svg>`;
         downloadBtn.addEventListener('click', () => downloadPDF(song.pdfUrl, song.name));
-
-        // Create GoodReader button
-        const goodReaderBtn = document.createElement('button');
-        goodReaderBtn.className = 'icon-btn goodreader-btn';
-        goodReaderBtn.title = 'Open in GoodReader';
-
-        const grImg = document.createElement('img');
-        grImg.src = 'images/gr-logo.svg';
-        grImg.alt = 'Open in GoodReader';
-        grImg.width = 20;
-        grImg.height = 20;
-
-        goodReaderBtn.appendChild(grImg);
-        goodReaderBtn.addEventListener('click', () => openInGoodReader(song.pdfUrl));
         
         // Assemble the song row
         songActions.appendChild(viewBtn);
         songActions.appendChild(downloadBtn);
-        songActions.appendChild(goodReaderBtn);
         songRow.appendChild(songName);
         songRow.appendChild(songActions);
         songList.appendChild(songRow);
