@@ -6,6 +6,16 @@ let songsByDrive = {};
 let currentPage = 1;
 let itemsPerPage = 10;
 let filteredSongs = [];
+let currentFullbook = null;
+let pendingDownload = null;
+let openDownloadModalHandler = null;
+
+const DOWNLOAD_HELP_PREF_KEY = 'skipDownloadHelpModal';
+
+const fullbookFilenamesByDrive = {
+    tvus: 'TVUS_fullbook.pdf',
+    gts: 'GTS_fullbook.pdf'
+};
 
 // Initialize when DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
@@ -17,6 +27,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (document.getElementById('song-list')) {
         loadConfig();
         setupSearch();
+        setupDownloadModal();
     }
 });
 
@@ -92,9 +103,132 @@ async function loadAllSongs() {
     await Promise.all(loadPromises);
 }
 
+function normalizeFilename(value) {
+    return (value || '').trim().toLowerCase().replace(/\.pdf$/i, '');
+}
+
+function getFullbookEntryForCurrentTab() {
+    const targetFilename = fullbookFilenamesByDrive[currentTab];
+    if (!targetFilename) return null;
+
+    const normalizedTarget = normalizeFilename(targetFilename);
+    const currentSongs = songsByDrive[currentTab] || [];
+
+    return currentSongs.find(song => {
+        const normalizedName = normalizeFilename(song.name);
+        return normalizedName === normalizedTarget || normalizedName.includes(normalizedTarget);
+    }) || null;
+}
+
+function getSongsForCurrentTab() {
+    const currentSongs = songsByDrive[currentTab] || [];
+    currentFullbook = getFullbookEntryForCurrentTab();
+
+    if (!currentFullbook) {
+        return [...currentSongs];
+    }
+
+    const nonFullbookSongs = currentSongs.filter(song => song.id !== currentFullbook.id);
+    return [currentFullbook, ...nonFullbookSongs];
+}
+
+function detectOS() {
+    const userAgent = navigator.userAgent || '';
+    const platform = navigator.platform || '';
+
+    if (/Android/i.test(userAgent)) return 'android';
+    if (/iPad|iPhone|iPod/i.test(userAgent) || (platform === 'MacIntel' && navigator.maxTouchPoints > 1)) return 'ios';
+    if (/Mac/i.test(platform)) return 'macos';
+    if (/Win/i.test(platform)) return 'windows';
+    return 'default';
+}
+
+function getHelpMessageForOS() {
+    const messages = {
+        android: 'Downloaded files on an Android tablet almost always go to the Downloads folder, accessible through the "Files," "My Files," or "File Manager" app. You can usually find this by opening your app drawer and searching for "Files". Files can also be found directly within the browser (e.g., Chrome) by opening the menu and selecting "Downloads."',
+        ios: 'Downloads on an iPad/iPhone are primarily found in the Files app (a blue folder icon) under the "Downloads" folder. Open the Files app, tap the "Browse" tab, and select either "iCloud Drive" or "On My iPad," then tap "Downloads" to view your files.',
+        macos: 'On macOS, downloaded files usually go to your Downloads folder in Finder. Open Finder and click Downloads in the left sidebar, or press Option + Command + L. You can also open your browser\'s download list (for example, in Safari or Chrome) to quickly locate the latest file.',
+        windows: 'On Windows, downloads usually go to the Downloads folder in File Explorer. Open File Explorer and select Downloads from the left sidebar, or go to This PC > Downloads. You can also open your browser\'s Downloads menu (such as in Chrome, Edge, or Firefox) to find and open recent files.',
+        default: 'Downloads are usually saved to your device\'s Downloads folder. You can also check your browser\'s Downloads menu to open the file directly.'
+    };
+
+    return messages[detectOS()] || messages.default;
+}
+
+function setupDownloadModal() {
+    const downloadModal = document.getElementById('download-modal');
+    const closeDownloadModalBtn = document.getElementById('close-download-modal');
+    const confirmDownloadBtn = document.getElementById('confirm-download-btn');
+    const downloadModalBody = document.getElementById('download-modal-body');
+    const skipDownloadHelpCheckbox = document.getElementById('skip-download-help');
+
+    if (!downloadModal || !closeDownloadModalBtn || !confirmDownloadBtn || !downloadModalBody || !skipDownloadHelpCheckbox) return;
+
+    function openDownloadModal() {
+        downloadModalBody.textContent = getHelpMessageForOS();
+        skipDownloadHelpCheckbox.checked = localStorage.getItem(DOWNLOAD_HELP_PREF_KEY) === 'true';
+        downloadModal.hidden = false;
+        document.body.classList.add('modal-open');
+    }
+
+    function closeDownloadModal() {
+        downloadModal.hidden = true;
+        document.body.classList.remove('modal-open');
+    }
+
+    function confirmDownload() {
+        if (skipDownloadHelpCheckbox.checked) {
+            localStorage.setItem(DOWNLOAD_HELP_PREF_KEY, 'true');
+        } else {
+            localStorage.removeItem(DOWNLOAD_HELP_PREF_KEY);
+        }
+
+        if (pendingDownload) {
+            downloadPDF(pendingDownload.pdfUrl, pendingDownload.songName);
+            pendingDownload = null;
+        }
+
+        closeDownloadModal();
+    }
+
+    closeDownloadModalBtn.addEventListener('click', closeDownloadModal);
+    confirmDownloadBtn.addEventListener('click', confirmDownload);
+
+    downloadModal.addEventListener('click', function(event) {
+        if (event.target === downloadModal) {
+            closeDownloadModal();
+        }
+    });
+
+    document.addEventListener('keydown', function(event) {
+        if (event.key === 'Escape' && !downloadModal.hidden) {
+            closeDownloadModal();
+        }
+    });
+
+    openDownloadModalHandler = openDownloadModal;
+}
+
+function handleDownloadRequest(pdfUrl, songName) {
+    const skipHelpModal = localStorage.getItem(DOWNLOAD_HELP_PREF_KEY) === 'true';
+
+    if (skipHelpModal) {
+        downloadPDF(pdfUrl, songName);
+        return;
+    }
+
+    pendingDownload = { pdfUrl, songName };
+
+    if (typeof openDownloadModalHandler === 'function') {
+        openDownloadModalHandler();
+    } else {
+        downloadPDF(pdfUrl, songName);
+    }
+}
+
 // Display songs for the current tab
 function displaySongsForCurrentTab() {
-    allSongs = songsByDrive[currentTab] || [];
+    allSongs = getSongsForCurrentTab();
     currentPage = 1; // Reset to page 1 when switching tabs
     filteredSongs = allSongs;
     displaySongs(filteredSongs);
@@ -128,6 +262,10 @@ function displaySongs(songs) {
     songsToDisplay.forEach(song => {
         const songRow = document.createElement('div');
         songRow.className = 'song-row';
+
+        if (currentFullbook && song.id === currentFullbook.id) {
+            songRow.classList.add('fullbook-row');
+        }
         
         const songName = document.createElement('div');
         songName.className = 'song-name';
@@ -156,7 +294,7 @@ function displaySongs(songs) {
             <polyline points="7 10 12 15 17 10"></polyline>
             <line x1="12" y1="15" x2="12" y2="3"></line>
         </svg>`;
-        downloadBtn.addEventListener('click', () => downloadPDF(song.pdfUrl, song.name));
+        downloadBtn.addEventListener('click', () => handleDownloadRequest(song.pdfUrl, song.name));
         
         // Assemble the song row
         songActions.appendChild(viewBtn);
@@ -240,7 +378,7 @@ function setupSearch() {
     if (searchInput) {
         searchInput.addEventListener('input', function(e) {
             const searchTerm = e.target.value.toLowerCase();
-            const currentSongs = songsByDrive[currentTab] || [];
+            const currentSongs = getSongsForCurrentTab();
             const filteredSongs = currentSongs.filter(song => 
                 song.name.toLowerCase().includes(searchTerm) ||
                 (song.artist && song.artist.toLowerCase().includes(searchTerm))
