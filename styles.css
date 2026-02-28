@@ -311,10 +311,6 @@ body.dark-mode .dark-mode-toggle .moon-icon {
     color: #ffffff;
 }
 
-.tabs {
-    margin-bottom: 1.5rem;
-}
-
 /* Modal */
 body.modal-open {
     overflow: hidden;
@@ -389,6 +385,7 @@ body.modal-open {
 .tabs {
     display: flex;
     gap: 0.5rem;
+    margin-bottom: 1.5rem;
     border-bottom: 2px solid var(--border-color);
 }
 

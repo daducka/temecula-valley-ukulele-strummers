@@ -8,6 +8,7 @@ let itemsPerPage = 10;
 let filteredSongs = [];
 let currentFullbook = null;
 let pendingDownload = null;
+let openDownloadModalHandler = null;
 
 const DOWNLOAD_HELP_PREF_KEY = 'skipDownloadHelpModal';
 
@@ -205,7 +206,7 @@ function setupDownloadModal() {
         }
     });
 
-    window.openDownloadModal = openDownloadModal;
+    openDownloadModalHandler = openDownloadModal;
 }
 
 function handleDownloadRequest(pdfUrl, songName) {
@@ -218,8 +219,8 @@ function handleDownloadRequest(pdfUrl, songName) {
 
     pendingDownload = { pdfUrl, songName };
 
-    if (typeof window.openDownloadModal === 'function') {
-        window.openDownloadModal();
+    if (typeof openDownloadModalHandler === 'function') {
+        openDownloadModalHandler();
     } else {
         downloadPDF(pdfUrl, songName);
     }
