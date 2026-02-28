@@ -78,6 +78,20 @@
         <div id="song-list" class="song-list-container">
             <!-- Songs will be loaded dynamically from JSON -->
         </div>
+
+        <div id="download-modal" class="modal-overlay" hidden>
+            <div class="modal-content" role="dialog" aria-modal="true" aria-labelledby="download-modal-title" aria-describedby="download-modal-subtitle download-modal-body">
+                <button id="close-download-modal" class="modal-close-btn" type="button" aria-label="Close download help">&times;</button>
+                <h1 id="download-modal-title">Help</h1>
+                <h2 id="download-modal-subtitle">Where do downloads go?</h2>
+                <p id="download-modal-body"></p>
+                <label class="download-modal-pref">
+                    <input type="checkbox" id="skip-download-help">
+                    Don't show this again
+                </label>
+                <button id="confirm-download-btn" class="songs-tool-btn" type="button">Download</button>
+            </div>
+        </div>
     </main>
 
     <!-- Footer -->

@@ -294,11 +294,101 @@ body.dark-mode .dark-mode-toggle .moon-icon {
     padding: 2rem 1.5rem;
 }
 
+.songs-tool-btn {
+    padding: 0.6rem 1rem;
+    border: 1px solid var(--primary-color);
+    background-color: var(--bg-primary);
+    color: var(--primary-color);
+    border-radius: 8px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.songs-tool-btn:hover {
+    background-color: var(--primary-color);
+    color: #ffffff;
+}
+
+.tabs {
+    margin-bottom: 1.5rem;
+}
+
+/* Modal */
+body.modal-open {
+    overflow: hidden;
+}
+
+.modal-overlay[hidden] {
+    display: none !important;
+}
+
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.45);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 1rem;
+}
+
+.modal-content {
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+    width: 100%;
+    max-width: 560px;
+    padding: 1.5rem;
+    position: relative;
+}
+
+.modal-content h1 {
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.modal-content h2 {
+    font-size: 1.1rem;
+    margin-bottom: 0.75rem;
+    color: var(--text-secondary);
+}
+
+.download-modal-pref {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 1rem 0;
+    color: var(--text-secondary);
+}
+
+#confirm-download-btn {
+    width: 100%;
+}
+
+.modal-close-btn {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.75rem;
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    font-size: 2rem;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.modal-close-btn:hover {
+    color: var(--text-primary);
+}
+
 /* Tabs */
 .tabs {
     display: flex;
     gap: 0.5rem;
-    margin-bottom: 1.5rem;
     border-bottom: 2px solid var(--border-color);
 }
 
@@ -406,6 +496,15 @@ body.dark-mode .dark-mode-toggle .moon-icon {
 .icon-btn:hover {
     background-color: var(--primary-color);
     color: #ffffff;
+}
+
+.song-row.fullbook-row {
+    background: linear-gradient(90deg, rgba(85, 115, 163, 0.15), var(--bg-secondary));
+    border: 1px solid var(--primary-color);
+}
+
+.song-row.fullbook-row .song-name {
+    font-weight: 700;
 }
 
 .error,
