@@ -86,6 +86,10 @@ body {
     align-items: center;
 }
 
+.landing-social-icons .social-icon {
+    color: var(--primary-color);
+}
+
 .logo-area {
     margin-bottom: 3rem;
     text-align: center;
