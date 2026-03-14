@@ -74,6 +74,16 @@ body {
     align-items: center;
     justify-content: center;
     padding: 2rem;
+    position: relative;
+}
+
+.landing-social-icons {
+    position: absolute;
+    top: 1.2rem;
+    right: 1.5rem;
+    display: flex;
+    gap: 1rem;
+    align-items: center;
 }
 
 .logo-area {
