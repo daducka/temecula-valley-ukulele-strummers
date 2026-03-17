@@ -77,19 +77,6 @@ body {
     position: relative;
 }
 
-.landing-social-icons {
-    position: absolute;
-    top: 1.2rem;
-    right: 1.5rem;
-    display: flex;
-    gap: 1rem;
-    align-items: center;
-}
-
-.landing-social-icons .social-icon {
-    color: var(--primary-color);
-}
-
 .logo-area {
     margin-bottom: 3rem;
     text-align: center;
@@ -143,6 +130,14 @@ body {
     color: var(--disabled-text);
     border-color: var(--disabled-border);
     cursor: not-allowed;
+}
+
+/* Center a lone last button (e.g. 5th item in a 2-column grid) */
+/* width matches the column size defined in grid-template-columns: repeat(2, 200px) */
+.nav-grid .nav-button:last-child:nth-child(odd) {
+    grid-column: 1 / -1;
+    justify-self: center;
+    width: 200px;
 }
 
 .landing-footer {
@@ -602,6 +597,10 @@ body.modal-open {
         grid-template-columns: 1fr;
         width: 100%;
         max-width: 300px;
+    }
+
+    .nav-grid .nav-button:last-child:nth-child(odd) {
+        width: 100%;
     }
 
     .nav-button {
