@@ -145,6 +145,13 @@ body {
     cursor: not-allowed;
 }
 
+/* Center a lone last button (e.g. 5th item in a 2-column grid) */
+.nav-grid .nav-button:last-child:nth-child(odd) {
+    grid-column: 1 / -1;
+    justify-self: center;
+    width: 200px;
+}
+
 .landing-footer {
     margin-top: auto;
     padding: 1rem 0;
@@ -602,6 +609,10 @@ body.modal-open {
         grid-template-columns: 1fr;
         width: 100%;
         max-width: 300px;
+    }
+
+    .nav-grid .nav-button:last-child:nth-child(odd) {
+        width: 100%;
     }
 
     .nav-button {
